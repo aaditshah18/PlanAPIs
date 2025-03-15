@@ -19,9 +19,9 @@ class PlanService:
 
     @staticmethod
     def get_plan(plan_id):
-        """Retrieves a plan by its ID and includes ETag for caching."""
+        """Retrieves a plan with ETag support for caching."""
+        breakpoint()
         plan = mongo.db.plans.find_one({"objectId": plan_id}, {"_id": 0})
-
         if not plan:
             return {"message": "Plan not found."}, HTTPStatus.NOT_FOUND
 
@@ -29,7 +29,7 @@ class PlanService:
 
         # Handle If-None-Match for caching
         if request.headers.get("If-None-Match") == etag:
-            return "", HTTPStatus.NOT_MODIFIED, {"ETag": etag}
+            return {"message": "Not modified."}, HTTPStatus.NOT_MODIFIED, {"ETag": etag}
 
         return plan, HTTPStatus.OK, {"ETag": etag}
 
@@ -43,24 +43,23 @@ class PlanService:
 
     @staticmethod
     def update_plan(plan_id, data):
-        """Updates a plan only if there is a change. Supports conditional read."""
+        """Updates a plan only if there is a change. Supports conditional read and write."""
         plan = mongo.db.plans.find_one({"objectId": plan_id}, {"_id": 0})
-
         if not plan:
             return {"message": "Plan not found."}, HTTPStatus.NOT_FOUND
 
         # Generate ETag for existing plan
         etag = generate_etag(plan)
 
-        # Handle If-Match for conditional update
-        if request.headers.get("If-Match") and request.headers["If-Match"] != etag:
+        # Handle If-Match for concurrency control
+        if "If-Match" in request.headers and request.headers["If-Match"] != etag:
             return {"message": "Plan has been modified by another process."}, HTTPStatus.PRECONDITION_FAILED
 
-        # Check if there is no change in the update request
+        # Check if the update request contains changes
         if all(plan.get(k) == v for k, v in data.items()):
             return {"message": "No changes detected.", "plan": plan}, HTTPStatus.OK, {"ETag": etag}
 
-        # Perform the update if there is a change
+        # Perform the update
         mongo.db.plans.update_one({"objectId": plan_id}, {"$set": data})
         updated_plan = mongo.db.plans.find_one({"objectId": plan_id}, {"_id": 0})
         updated_etag = generate_etag(updated_plan)
