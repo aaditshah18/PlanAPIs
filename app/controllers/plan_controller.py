@@ -14,8 +14,7 @@ class PlanResource(Resource):
         """
         try:
             data = request.get_json()
-            result = PlanService.create_plan(data)
-            return result, 201
+            return PlanService.create_plan(data)  # Directly returning the service response
         except Exception as e:
             return {"error": str(e)}, 500
 
@@ -26,10 +25,7 @@ class PlanResource(Resource):
         """
         try:
             print(f"User: {request.user}")
-            plan = PlanService.get_plan(plan_id)
-            if plan:
-                return plan, 200
-            return {"error": "Plan not found"}, 404
+            return PlanService.get_plan(plan_id)  # Directly returning the service response
         except Exception as e:
             return {"error": str(e)}, 500
 
@@ -41,10 +37,7 @@ class PlanResource(Resource):
         """
         try:
             data = request.get_json()
-            result = PlanService.update_plan(plan_id, data)
-            if result:
-                return result, 200
-            return {"error": "Plan not found"}, 404
+            return PlanService.update_plan(plan_id, data)  # Directly returning the service response
         except Exception as e:
             return {"error": str(e)}, 500
 
@@ -54,9 +47,6 @@ class PlanResource(Resource):
         Delete a plan by ID (Requires authentication).
         """
         try:
-            result = PlanService.delete_plan(plan_id)
-            if result:
-                return result, 200
-            return {"error": "Plan not found"}, 404
+            return PlanService.delete_plan(plan_id)  # Directly returning the service response
         except Exception as e:
             return {"error": str(e)}, 500
