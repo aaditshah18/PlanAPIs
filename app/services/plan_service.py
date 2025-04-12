@@ -2,6 +2,9 @@ from flask import request
 from app import mongo
 from http import HTTPStatus
 from app.utils import generate_etag
+from app.tasks import index_plan_task, update_plan_task, delete_plan_task
+from app.services.elasticsearch_service import es_service
+
 
 class PlanService:
     @staticmethod
@@ -13,6 +16,9 @@ class PlanService:
 
         mongo.db.plans.insert_one(data)
         new_plan = mongo.db.plans.find_one({"objectId": plan_id}, {"_id": 0})
+
+        # Queue Elasticsearch indexing task
+        index_plan_task.delay(plan_id, new_plan)
         etag = generate_etag(new_plan)
 
         return {"message": "Plan stored successfully.", "plan": new_plan}, HTTPStatus.CREATED, {"ETag": etag}
@@ -37,6 +43,7 @@ class PlanService:
         """Deletes a plan by its ID and returns appropriate status."""
         result = mongo.db.plans.delete_one({"objectId": plan_id})
         if result.deleted_count:
+            delete_plan_task.delay(plan_id)
             return {"message": "Plan deleted."}, HTTPStatus.NO_CONTENT
         return {"message": "Plan not found."}, HTTPStatus.NOT_FOUND
 
@@ -94,6 +101,9 @@ class PlanService:
         # Apply the logic to the plan and data
         updated_plan = handle_object_id_changes(plan, data)
 
+        # Queue Elasticsearch update task
+        update_plan_task.delay(plan_id, updated_plan)
+
         # Perform the update
         mongo.db.plans.update_one({"objectId": plan_id}, {"$set": updated_plan})
         updated_plan = mongo.db.plans.find_one({"objectId": plan_id}, {"_id": 0})
@@ -103,3 +113,9 @@ class PlanService:
             "message": "Plan updated successfully.",
             "plan": updated_plan
         }, HTTPStatus.OK, {"ETag": updated_etag}
+    
+    @staticmethod
+    def search_plans(query_string):
+        """Search for plans using Elasticsearch."""
+        results = es_service.search_plans(query_string)
+        return {"results": results}, HTTPStatus.OK
