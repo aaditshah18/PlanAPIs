@@ -1,1 +1,11 @@
 .env
+venv/
+*.pyc
+__pycache__/
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Misc
+.DS_Store
