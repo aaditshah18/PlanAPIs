@@ -1,10 +1,10 @@
-# **Plan API** 
+# Plan API
 
 **Plan API** is a Flask-based REST API that allows users to store, retrieve, update, and delete plan records efficiently. It is backed by **MongoDB** as a key-value store and follows RESTful best practices for structured JSON data handling.
 
 ---
 
-## **⚡ Features**
+## ⚡ Features
 - **CRUD operations**: Create, Read, Update, and Delete plans  
 - **JSON-based key-value storage** using **MongoDB**  
 - **Schema validation** to ensure structured data  
@@ -12,7 +12,7 @@
 
 ---
 
-## ** Prerequisites**
+##  Prerequisites
 Ensure you have the following installed before running the application:  
 1. **Python 3.8+**  
 2. **MongoDB 8** (Installation guide below)  
@@ -20,7 +20,7 @@ Ensure you have the following installed before running the application:
 
 ---
 
-## ** Step 1: Install MongoDB**
+## Step 1: Install MongoDB
 To install MongoDB **on macOS**, follow the official guide:  
 🔗 [MongoDB Installation for macOS](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/)  
 
@@ -45,36 +45,36 @@ use plan_api_db (Or any name you'd like)
 
 ---
 
-## ** Step 2: Set Up and Run the Flask Application**
-### **1️⃣ Clone the Repository**
+## Step 2: Set Up and Run the Flask Application
+### 1️⃣ Clone the Repository
 ```sh
 git clone <your-repo-url>
 cd plan-api
 ```
 
-### ** Create a Virtual Environment**
+### Create a Virtual Environment
 ```sh
 python3 -m venv venv
 source venv/bin/activate  # For Mac/Linux
 venv\Scripts\activate  # For Windows
 ```
 
-### ** Install Dependencies**
+### Install Dependencies
 ```sh
 pip install -r requirements.txt
 ```
 
-### ** Configure MongoDB Connection**
+### Configure MongoDB Connection
 Ensure MongoDB is **running locally** on `mongodb://localhost:27017`. You can modify database settings in **config.py** if needed.
 
-### ** Run the Flask Application**
+### Run the Flask Application
 ```sh
 python3 run.py
 ```
 
 ---
 
-## ** API Endpoints**
+## API Endpoints
 | Method | Endpoint | Description |
 |--------|---------|-------------|
 | **POST** | `/api/v1/plans` | Store a new plan |
@@ -122,7 +122,7 @@ Example **POST** request:
 
 ---
 
-## ** Testing the API**
+## Testing the API
 Use **Postman** or **cURL** to test the API.  
 
 Example **GET request using cURL**:
@@ -132,7 +132,7 @@ curl -X GET http://127.0.0.1:8000/api/v1/plans/12xvxc345ssdsds-508
 
 ---
 
-## ** Contributors**
+## Contributors
 Feel free to fork and contribute! 🚀
 
 ---
